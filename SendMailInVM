@@ -1,0 +1,51 @@
+使用阿里云服务器发送邮件
+https://blog.csdn.net/m0_37673753/article/details/81356298
+
+
+echo -n | openssl s_client -connect smtp.163.com:465 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > 163.crt
+certutil -A -n "GeoTrust SSL CA" -t "C,," -d ~/.certs -i ~/.certs/163.crt
+ 1046  certutil -A -n "GeoTrust Global CA" -t "C,," -d ~/.certs -i ~/.certs/163.crt
+ 1047  certutil -A -n "GeoTrust SSL CA - G3" -t "Pu,Pu,Pu" -d ~/.certs/./ -i 163.crt
+ 1048  certutil -L -d /root/.certs
+
+chmod 777 ~/.certs/163.crt
+vim /etc/postfix/main.cf
+
+#inet_interfaces = all
+#inet_interfaces = $myhostname
+#inet_interfaces = $myhostname, localhost
+inet_interfaces = all
+
+# Enable IPv4, and IPv6 if supported
+inet_protocols = all
+
+service postfix start
+
+vim /etc/mail.rc
+
+set  from=czy20140714@163.com
+set smtp=smtps://smtp.163.com:465
+set smtp-auth-user=czy20140714@163.com
+set smtp-auth-password=QXXJYGDGDLDQDWBB
+set smtp-auth=login
+set ssl-verify=ignore
+set nss-config-dir=/root/.certs
+
+
+echo "hello,this is the content of mail.welcome to www.mzone.cc" | mail -s "Hello from mzone.cc by pipe" czy20140714@163.com
+
+
+
+certutil -A -n "GeoTrust SSL CA" -t "C,," -d ~/.certs -i ~/.certs/163.crt
+
+certutil -A -n "GeoTrust Global CA" -t "C,," -d ~/.certs -i ~/.certs/163.crt
+
+certutil -A -n "GeoTrust SSL CA - G3" -t "Pu,Pu,Pu" -d ~/.certs/./ -i 163.crt
+
+certutil -L -d /root/.certs
+————————————————
+版权声明：本文为CSDN博主「CC-梅」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/m0_37673753/article/details/81356298
+
+
+mail -s 'this is a test mail from aliVm triggered by zhiyuan' zhiyuan_cui@yahoo.com,czy20140714@163.com < /etc/passwd
